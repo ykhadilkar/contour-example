@@ -91,5 +91,5 @@ or
  kubectl delete deploy nginx
  kubectl delete svc httpd
  kubectl delete deploy httpd
- kubectl delete -f contour.yaml
+ kubectl delete ns projectcontour
  ```
