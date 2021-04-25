@@ -1,5 +1,15 @@
 # Contour Example
 
+## Make sure to have LB. In homelab install MetalLB
+```
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml
+# On first install only
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+kubectl apply -f metal-lb-config.yaml
+```
+
 ## Install Contour 
 `kubectl apply -f contour.yaml`
 
@@ -16,10 +26,14 @@ kubectl expose deploy httpd --port=80
 ### Apply simple ingress yaml
 `kubectl apply -f simple-ingress.yaml`
 
+Check out http://192.168.2.240.xip.io
+
 ## Named virtual host
 
 ### Using ingress 
 `kubectl apply -f name-virtual-host-ingress.yaml`
+
+Goto http://httpd.192.168.2.240.xip.io/ and http://nginx.192.168.2.240.xip.io/
 
 ### Using Httpproxy
 Delte ingress based virtual host first
@@ -28,6 +42,7 @@ Delte ingress based virtual host first
 Now create httpproxy based virtual host
 `kubectl apply -f httpproxy-virtual-host.yaml`
 
+Goto http://httpd.192.168.2.240.xip.io/ and http://nginx.192.168.2.240.xip.io/
 
 ## Blue Green Deployment
 `kubectl apply -f httpproxy-blue-green.yaml`
@@ -37,7 +52,7 @@ Goto http://bg.192.168.2.240.xip.io
 or 
 
  ```
- while true; http bg.192.168.2.240.xip.io | grep h1; sleep 1; done
+ while :; do http bg.192.168.2.240.xip.io | grep h1; sleep 1; done
  ```
 
 ## Weighted Routing
@@ -49,7 +64,7 @@ Goto http://wt.192.168.2.240.xip.io
 or 
 
  ```
- while true; http wt.192.168.2.240.xip.io | grep h1; sleep 1; done
+ while true; do http wt.192.168.2.240.xip.io | grep h1; sleep 1; done
  ```
 
 
@@ -62,5 +77,19 @@ Goto http://rt.192.168.2.240.xip.io
 or 
 
  ```
- while true; http rt.192.168.2.240.xip.io | grep h1; sleep 1; done
+ while true; do http rt.192.168.2.240.xip.io; sleep 1; done
+ ```
+
+ ## Clean Up
+ ```
+ kubectl delete -f httpproxy-rate-limiting.yaml
+ kubectl delete -f httpproxy-weighted.yaml
+ kubectl delete -f httpproxy-blue-green.yaml
+ kubectl delete -f httpproxy-virtual-host.yaml
+ kubectl delete -f simple-ingress.yaml
+ kubectl delete svc nginx
+ kubectl delete deploy nginx
+ kubectl delete svc httpd
+ kubectl delete deploy httpd
+ kubectl delete -f contour.yaml
  ```
