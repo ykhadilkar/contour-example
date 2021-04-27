@@ -3,26 +3,6 @@
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
-  name: namespace-include-root
-  namespace: engineering
-spec:
-  virtualhost:
-    fqdn: mt.192.168.2.240.xip.io
-  includes:
-  # delegate the subpath, `/blog` to the HTTPProxy object in the marketing namespace with the name `blog`
-  - name: blog
-    namespace: engineering
-    conditions:
-    - prefix: /blog
-  # routes:
-  #   - services:
-  #       - name: httpd
-  #         port: 80
-
----
-apiVersion: projectcontour.io/v1
-kind: HTTPProxy
-metadata:
   name: blog
   namespace: engineering
 spec:

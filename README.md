@@ -80,6 +80,24 @@ or
  while true; do http rt.192.168.2.240.xip.io; sleep 1; done
  ```
 
+## Team Delegation
+```bash
+kubectl create ns marketing
+kubectl create ns engineering
+kubectl create deploy blog --image=ykhadilkar/blog -n marketing
+kubectl expose deploy blog --port=80 --target-port=8080 -n marketing
+kubectl apply -f httpproxy-multi-team.yaml
+```
+
+Test going to http://mt.192.168.2.240.xip.io/blog or using cli
+`http mt.192.168.2.240.xip.io/blog`
+
+Now lets test another team trying to create blog at same path
+
+`kubectl apply -f httpproxy-inclusion-test.yaml`
+
+Check status of httpproxy and check out same path.
+
  ## Clean Up
  ```
  kubectl delete -f httpproxy-rate-limiting.yaml
@@ -91,5 +109,7 @@ or
  kubectl delete deploy nginx
  kubectl delete svc httpd
  kubectl delete deploy httpd
- kubectl delete ns projectcontour
+ kubectl delete ns marketing
+ kubectl delete ns engineering
+ kubectl delete -f contour.yaml
  ```
